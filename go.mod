@@ -1,4 +1,4 @@
-module github.com/aweis89/go-echo-service
+module github.com/Jaabaali/go-echo-service
 
 go 1.21.6
 
