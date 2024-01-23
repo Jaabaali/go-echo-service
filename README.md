@@ -11,7 +11,7 @@ import (
 	"os"
 	"time"
 
-	svc "github.com/aweis89/go-echo-service"
+	svc "github.com/Jaabaali/go-echo-service"
 	"github.com/labstack/echo/v4/middleware"
 	flag "github.com/spf13/pflag"
 )
