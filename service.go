@@ -14,6 +14,7 @@ import (
 	"github.com/labstack/echo-contrib/echoprometheus"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	oapimiddleware "github.com/oapi-codegen/echo-middleware"
 	slogecho "github.com/samber/slog-echo"
 	"go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho"
 	"go.opentelemetry.io/otel/trace"
@@ -68,7 +69,7 @@ func (svc *service) Setup(ctx context.Context) (*echo.Echo, logr.Logger, func())
 	router.Use(middleware.Recover())
 	router.Use(echoprometheus.NewMiddleware("http"))
 	router.Use(otelecho.Middleware(svc.name,
-		otelecho.WithSkipper(svc.tracerSkip)))
+		otelecho.WithSkipper(svc.skipper)))
 
 	router.HTTPErrorHandler = func(err error, c echo.Context) {
 		ctx := c.Request().Context()
@@ -91,6 +92,14 @@ func (svc *service) Setup(ctx context.Context) (*echo.Echo, logr.Logger, func())
 		return c.String(http.StatusOK, "OK") //nolint:wrapcheck
 	})
 
+	if svc.swagger != nil {
+		router.Use(
+			oapimiddleware.OapiRequestValidatorWithOptions(svc.swagger, &oapimiddleware.Options{
+				Skipper: svc.skipper,
+			}),
+		)
+	}
+
 	svc.router = router
 	return svc.router, svc.logr, shutdown
 }
@@ -102,7 +111,7 @@ func (svc *service) requestLoggingConfig() slogecho.Config {
 	}
 }
 
-func (svc *service) tracerSkip(c echo.Context) bool {
+func (svc *service) skipper(c echo.Context) bool {
 	return !svc.telemetryRun(c)
 }
 
