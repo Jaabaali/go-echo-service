@@ -1,6 +1,8 @@
 package service
 
 import (
+	"context"
+
 	"github.com/go-logr/logr"
 	"github.com/labstack/echo/v4"
 )
@@ -22,7 +24,10 @@ var (
 	DefaultSampleRate  = 0.2
 )
 
-func NewService(serviceName string, opts ...func(*service)) *service {
+func NewService(ctx context.Context,
+	serviceName string,
+	opts ...func(*service),
+) (*echo.Echo, logr.Logger, func()) {
 	svc := &service{
 		name: serviceName,
 	}
@@ -38,7 +43,7 @@ func NewService(serviceName string, opts ...func(*service)) *service {
 	if svc.otelSampleRate == 0 {
 		svc.otelSampleRate = DefaultSampleRate
 	}
-	return svc
+	return svc.setup(ctx)
 }
 
 func WithHealthPath(path string) func(*service) {
