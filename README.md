@@ -23,20 +23,18 @@ func main() {
 	otelSampleRate := flag.Float64("otel-sample-rate", 0.2, "otel sample rate")
 	flag.Parse()
 
-	ctx := context.Background()
-
 	otelEndpoint := *otelHost + ":" + *otelPort
-
-	// get router logr and shutdown function
-	router, logr, shutdown := svc.NewService("service-tts",
+	service := svc.NewService("service-tts",
 		svc.WithOtelEndpoint(otelEndpoint),
 		svc.WithSampleRate(*otelSampleRate),
 	)
+	ctx := context.Background()
 
+	// get router logr and shutdown function
 	router, logr, shutdown := service.Setup(ctx)
 	defer shutdown()
 
-	// add additional middleware
+	// add middleware
 	router.Use(middleware.CORS())
 
 	logr.Info("starting server")
