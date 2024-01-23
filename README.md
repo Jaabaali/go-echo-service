@@ -7,15 +7,13 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"os"
-	"strings"
 	"time"
 
+	svc "github.com/aweis89/go-echo-service"
 	"github.com/labstack/echo/v4/middleware"
 	flag "github.com/spf13/pflag"
-  svc "github.com/aweis89/go-echo-service"
 )
 
 func main() {
@@ -32,15 +30,15 @@ func main() {
 	)
 	ctx := context.Background()
 
-  // get router logr and shutdown function
+	// get router logr and shutdown function
 	router, logr, shutdown := service.Setup(ctx)
 	defer shutdown()
 
-  // add middleware
+	// add middleware
 	router.Use(middleware.CORS())
 
 	logr.Info("starting server")
-  // with graceful shutdown
+	// with graceful shutdown
 	service.Start(ctx, &http.Server{
 		Addr:              *addr,
 		ReadTimeout:       10 * time.Second,
