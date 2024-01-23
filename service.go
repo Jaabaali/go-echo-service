@@ -43,7 +43,7 @@ func (svc *service) Start(ctx context.Context, server *http.Server) {
 	}
 }
 
-func (svc *service) Setup(ctx context.Context) (*echo.Echo, logr.Logger, func()) {
+func (svc *service) setup(ctx context.Context) (*echo.Echo, logr.Logger, func()) {
 	shutdown, err := svc.SetupOtel(ctx)
 	if err != nil {
 		svc.logr.Error(err, "failed to setup otel")
